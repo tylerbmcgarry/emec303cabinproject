@@ -8,7 +8,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-# Constants
+
+#%% Define Euler Function
+def euler(f, x0, y0, h, L):
+
+    
+    N = int(L/h)
+    
+    x = np.zeros(N)
+    y = np.zeros(N)
+    
+    x[0] = x0
+    y[0] = y0
+    
+    #build arrays
+    
+    for i in range(N-1):
+        x[i+1] = x[i] + h 
+        y[i+1] = y[i] + h*f(x[i], y[i]) #euler method
+        
+    return x, y
+        
+
+#%% Constants
 C_air = 1.005e3  # J/(kg*K)
 rho_air = 1.2  # kg/m3
 k1 = 0.2  # W/(m2*K)
@@ -21,13 +43,12 @@ V_top = 30  # Top Room volumes in m3
 
 
 
-#%%
+#%% Room Dimensions
+
 L = 5
 W = 6
 H1 = 3 
 H2 = 3
-
-
 
 A_fire = 0.5  # Fireplace area in m2
 A_walls =  L*H1*2 + W*H1*2 #all side walls of cabin in m2
@@ -37,7 +58,7 @@ A_ceil = L*W  #ceiling area in m2
 
 # Outside temperature function (Eq. 4)
 def T_out(t):
-    return -10 * np.sin((2 * np.pi * t) / 86400)
+    return -10 * np.sin((2 * np.pi * t) / 86400   )
 
 # Fireplace
 
@@ -65,18 +86,20 @@ def cabin_ode(t, T):
     
     
     
-    
     # Temperature derivatives
     dT1_dt = (-A_walls * Q_wall - A_walls * Q_ceil + A_ceil * Q_fire(t)) / (C_air * rho_air * V_bot)
     dT2_dt = (A_ceil * Q_ceil - A_roof * Q_roof) / (C_air * rho_air * V_top)
     
+    
     return [dT1_dt, dT2_dt]
 
+ 
 # Initial conditions
 T1_0 = 7
 T2_0 = 5  # Initial temperatures in Celsius
-t_start, t_end = 0, 2 * 86400  # Simulate for 2 days (in seconds)
-t_eval = np.linspace(t_start, t_end, 1000)  # Time points for evaluation
+t_start = 0 
+t_end = 2 * 86400  # Simulate for 2 days (in seconds)
+t_eval = np.linspace(t_start, t_end)  # Time points for evaluation
 
 # Solve the ODEs
 sol = solve_ivp(cabin_ode, [t_start, t_end], [T1_0, T2_0], t_eval=t_eval, method='RK45')
@@ -85,6 +108,8 @@ sol = solve_ivp(cabin_ode, [t_start, t_end], [T1_0, T2_0], t_eval=t_eval, method
 plt.figure(figsize=(10, 5))
 plt.plot(sol.t / 3600, sol.y[0], label="T1 (Downstairs)")
 plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
+
+plt.plot(T_out(t_eval), label = 'Temp Outside')
 plt.xlabel("Time (hours)")
 plt.ylabel("Temperature (°C)")
 plt.legend()
