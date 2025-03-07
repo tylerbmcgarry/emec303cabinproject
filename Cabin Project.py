@@ -12,19 +12,34 @@ from scipy.integrate import solve_ivp
 C_air = 1.005e3  # J/(kg*K)
 rho_air = 1.2  # kg/m3
 k1 = 0.2  # W/(m2*K)
+k2 = 10  # Initial value, adjustable
 k3 = 0.5  # W/(m2*K)
-A1, A2, A3 =   # Areas in m2 
-V1 = 50 #bottom room
-V2 = 30  # Top Room volumes in m3
-A_in = 0.5  # Fireplace area in m2
-k2 = 5  # Initial value, adjustable
+
+V_bot = 50 #volume bottom room
+V_up = 30  # Top Room volumes in m3
+
+
+
+#%%
+L = 5
+W = 6
+H1 = 3 
+H2 = 3
+
+
+
+A_fire = 0.5  # Fireplace area in m2
+A_walls =  L*H1*2 + W*H1*2 #all side walls of cabin in m3
+A_roof =  0.5*H2*W*2 + L*H2*np.sqrt(2)*2
+A_ceil = L*W
+#%%
 
 # Outside temperature function (Eq. 4)
 def T_out(t):
-    return -10 * np.sin(2 * np.pi * t / 86400)
+    return -10 * np.sin((2 * np.pi * t) / 86400)
 
 # Fireplace
-def Q_in(t):
+def Q_fire(t):
     return 0  #fire control
 
 # ODE system 
@@ -33,18 +48,22 @@ def cabin_ode(t, T):
     Tout = T_out(t)
     
     # Heat fluxes
-    Q1 = k1 * (T1 - Tout)
-    Q2 = k2 * (T1 - T2)
-    Q3 = k3 * (T2 - Tout)
+    Q_wall = k1 * (T1 - Tout)
+    Q_ceil = k2 * (T1 - T2)
+    Q_roof = k3 * (T2 - Tout)
+    
+    
+    
     
     # Temperature derivatives
-    dT1_dt = (-A1 * Q1 - A2 * Q2 + A_in * Q_in(t)) / (C_air * rho_air * V1)
+    dT1_dt = (- * Q_wall - A_wall * Q_ceil + A_ceil * Q_fire(t)) / (C_air * rho_air * V_bot)
     dT2_dt = (A2 * Q2 - A3 * Q3) / (C_air * rho_air * V2)
     
     return [dT1_dt, dT2_dt]
 
 # Initial conditions
-T1_0, T2_0 = 7, 5  # Initial temperatures in Celsius
+T1_0 = 7
+T2_0 = 5  # Initial temperatures in Celsius
 t_start, t_end = 0, 2 * 86400  # Simulate for 2 days (in seconds)
 t_eval = np.linspace(t_start, t_end, 1000)  # Time points for evaluation
 
