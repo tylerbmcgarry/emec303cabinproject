@@ -87,8 +87,10 @@ def cabin_ode(t, T):
     
     
     # Temperature derivatives
-    dT1_dt = (-A_walls * Q_wall - A_walls * Q_ceil + A_ceil * Q_fire(t)) / (C_air * rho_air * V_bot)
-    dT2_dt = (A_ceil * Q_ceil - A_roof * Q_roof) / (C_air * rho_air * V_top)
+    dT1_dt = ( (-A_walls * Q_wall) - (A_ceil * Q_ceil) + (A_fire * Q_fire(t)) ) / (C_air * rho_air * V_bot) ## rate of bot temp change wrt time
+    
+    
+    dT2_dt = ( (A_ceil * Q_ceil) - (A_roof * Q_roof) ) / (C_air * rho_air * V_top) #rate of top temp change wrt time
     
     
     return [dT1_dt, dT2_dt]
