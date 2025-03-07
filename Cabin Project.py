@@ -71,8 +71,16 @@ koak = 0.2 #h^-1
 noak = 1.4 
 
 # Fireplace
-def Q_fire(t):
-    return 0 #Q0*(1 + kpine*t)**(-npine)  #fire control
+
+logtime = [0, 6, 12, 18, 24, 30, 36, 38]
+
+def Q_fire(t, t1, k, n):
+    #return 500 * np.sin((2 * np.pi * t) / 86400) #Q0*(1 + kpine*t)**(-npine)  #fire control
+    
+    return np.heaviside()
+
+
+
 
 # ODE system 
 def cabin_ode(t, T):
@@ -84,11 +92,8 @@ def cabin_ode(t, T):
     Q_ceil = k2 * (T1 - T2)
     Q_roof = k3 * (T2 - Tout)
     
-    
-    
     # Temperature derivatives
     dT1_dt = ( (-A_walls * Q_wall) - (A_ceil * Q_ceil) + (A_fire * Q_fire(t)) ) / (C_air * rho_air * V_bot) ## rate of bot temp change wrt time
-    
     
     dT2_dt = ( (A_ceil * Q_ceil) - (A_roof * Q_roof) ) / (C_air * rho_air * V_top) #rate of top temp change wrt time
     
@@ -99,6 +104,7 @@ def cabin_ode(t, T):
 # Initial conditions
 T1_0 = 7
 T2_0 = 5  # Initial temperatures in Celsius
+
 t_start = 0 
 t_end = 2 * 86400  # Simulate for 2 days (in seconds)
 t_eval = np.linspace(t_start, t_end)  # Time points for evaluation
@@ -109,12 +115,14 @@ sol = solve_ivp(cabin_ode, [t_start, t_end], [T1_0, T2_0], t_eval=t_eval, method
 # Plot results
 plt.figure(figsize=(10, 5))
 plt.plot(sol.t / 3600, sol.y[0], label="T1 (Downstairs)")
-plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
+#plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
 
-plt.plot(T_out(t_eval), label = 'Temp Outside')
+plt.plot(T_out(t_eval), 'g-', label = 'Temp Outside')
+plt.plot(Q_fire(t_eval)/50, 'r-',  label = 'Energy of Fire')
+
 plt.xlabel("Time (hours)")
 plt.ylabel("Temperature (°C)")
 plt.legend()
-plt.title("Cabin Temperature Over Time (No Fire)")
+plt.title("Cabin Temperature Over Time (")
 plt.grid()
 plt.show()
