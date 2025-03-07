@@ -12,11 +12,12 @@ from scipy.integrate import solve_ivp
 C_air = 1.005e3  # J/(kg*K)
 rho_air = 1.2  # kg/m3
 k1 = 0.2  # W/(m2*K)
-k2 = 10  # Initial value, adjustable
+k2 = 10  
 k3 = 0.5  # W/(m2*K)
+Q0 = 500  # W/m2
 
 V_bot = 50 #volume bottom room
-V_up = 30  # Top Room volumes in m3
+V_top = 30  # Top Room volumes in m3
 
 
 
@@ -39,8 +40,18 @@ def T_out(t):
     return -10 * np.sin((2 * np.pi * t) / 86400)
 
 # Fireplace
+
+# Pine Constants
+kpine = 0.5 #h^-1
+npine = 2.1 
+
+#Oak Constants
+koak = 0.2 #h^-1
+noak = 1.4 
+
+# Fireplace
 def Q_fire(t):
-    return 0  #fire control
+    return Q0*(1 + kpine*t)**(-npine)  #fire control
 
 # ODE system 
 def cabin_ode(t, T):
@@ -56,8 +67,8 @@ def cabin_ode(t, T):
     
     
     # Temperature derivatives
-    dT1_dt = (- * Q_wall - A_wall * Q_ceil + A_ceil * Q_fire(t)) / (C_air * rho_air * V_bot)
-    dT2_dt = (A2 * Q2 - A3 * Q3) / (C_air * rho_air * V2)
+    dT1_dt = (-A_walls * Q_wall - A_walls * Q_ceil + A_ceil * Q_fire(t)) / (C_air * rho_air * V_bot)
+    dT2_dt = (A_ceil * Q_ceil - A_roof * Q_roof) / (C_air * rho_air * V_top)
     
     return [dT1_dt, dT2_dt]
 
