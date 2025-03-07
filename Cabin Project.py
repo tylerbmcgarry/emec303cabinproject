@@ -30,9 +30,9 @@ H2 = 3
 
 
 A_fire = 0.5  # Fireplace area in m2
-A_walls =  L*H1*2 + W*H1*2 #all side walls of cabin in m3
-A_roof =  0.5*H2*W*2 + L*H2*np.sqrt(2)*2
-A_ceil = L*W
+A_walls =  L*H1*2 + W*H1*2 #all side walls of cabin in m2
+A_roof =  0.5*H2*W*2 + L*H2*np.sqrt(2)*2 #roof area in m2
+A_ceil = L*W  #ceiling area in m2
 #%%
 
 # Outside temperature function (Eq. 4)
@@ -51,7 +51,7 @@ noak = 1.4
 
 # Fireplace
 def Q_fire(t):
-    return Q0*(1 + kpine*t)**(-npine)  #fire control
+    return 0 #Q0*(1 + kpine*t)**(-npine)  #fire control
 
 # ODE system 
 def cabin_ode(t, T):
