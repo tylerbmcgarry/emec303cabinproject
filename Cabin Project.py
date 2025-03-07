@@ -10,12 +10,13 @@ from scipy.integrate import solve_ivp
 
 # Constants
 C_air = 1.005e3  # J/(kg*K)
-rho_air = 1.2  # kg/m³
-k1 = 0.2  # W/(m²*K)
-k3 = 0.5  # W/(m²*K)
-A1, A2, A3 =   # Areas in m² 
-V1, V2 = 50, 30  # Room volumes in m³ 
-A_in = 0.5  # Fireplace area in m²
+rho_air = 1.2  # kg/m3
+k1 = 0.2  # W/(m2*K)
+k3 = 0.5  # W/(m2*K)
+A1, A2, A3 =   # Areas in m2 
+V1 = 50 #bottom room
+V2 = 30  # Top Room volumes in m3
+A_in = 0.5  # Fireplace area in m2
 k2 = 5  # Initial value, adjustable
 
 # Outside temperature function (Eq. 4)
