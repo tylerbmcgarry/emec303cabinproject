@@ -69,10 +69,6 @@ high_limit = 27
 
 
 
-
-
-
-
 # Fireplace
 
 
@@ -90,10 +86,18 @@ noak = 1.4
 logtime = [0, 6, 12, 18, 24, 30, 36, 38]
 
 def Q_fire(t):#, t1, k, n):
+    
+     sum (Qin(t-t_add))
     return 500 * np.sin((2 * np.pi * t) / 86400)+1700 #Q0*(1 + kpine*t)**(-npine)  #fire control
     
-    #return np.heaviside()
 
+#Add_log funciton(t):
+    #if t < 0:
+     #   Q_log ==0
+ #else:
+     #add decay funciton
+# Input some itime
+    
 
 
 
@@ -143,8 +147,8 @@ plt.plot(sol.t / 3600, sol.y[0], label="T1 (Downstairs)")
 plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
 plt.plot(sol.t / 3600, T_out(t_eval), 'g-', label='Temp Outside')
 
-plt.axhline(y=low_limit, color='black', linestyle='--', label='Low Temp Boundary')
-plt.axhline(y=high_limit, color='black', linestyle='--', label='High Temp Boundary')
+plt.axhline(y=low_limit, color='black', linestyle='--', label='Temp Boundary')
+plt.axhline(y=high_limit, color='black', linestyle='--',)
 
 plt.ylabel("Temperature (°C)")
 plt.legend()
