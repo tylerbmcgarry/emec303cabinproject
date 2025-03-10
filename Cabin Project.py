@@ -74,10 +74,10 @@ noak = 1.4
 
 logtime = [0, 6, 12, 18, 24, 30, 36, 38]
 
-def Q_fire(t, t1, k, n):
-    #return 500 * np.sin((2 * np.pi * t) / 86400) #Q0*(1 + kpine*t)**(-npine)  #fire control
+def Q_fire(t ):#, t1, k, n):
+    return 500 * np.sin((2 * np.pi * t) / 86400) #Q0*(1 + kpine*t)**(-npine)  #fire control
     
-    return np.heaviside()
+    #return np.heaviside()
 
 
 
@@ -123,6 +123,6 @@ plt.plot(Q_fire(t_eval)/50, 'r-',  label = 'Energy of Fire')
 plt.xlabel("Time (hours)")
 plt.ylabel("Temperature (°C)")
 plt.legend()
-plt.title("Cabin Temperature Over Time (")
+plt.title("Cabin Temperature Over Time ")
 plt.grid()
 plt.show()
