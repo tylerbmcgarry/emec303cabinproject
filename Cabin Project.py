@@ -60,7 +60,22 @@ A_ceil = L*W  #ceiling area in m2
 def T_out(t):
     return -10 * np.sin((2 * np.pi * t) / 86400   )
 
+
+
+
+
+low_limit = 12.5
+high_limit = 27
+
+
+
+
+
+
+
 # Fireplace
+
+
 
 # Pine Constants
 kpine = 0.5 #h^-1
@@ -74,8 +89,8 @@ noak = 1.4
 
 logtime = [0, 6, 12, 18, 24, 30, 36, 38]
 
-def Q_fire(t ):#, t1, k, n):
-    return 500 * np.sin((2 * np.pi * t) / 86400) #Q0*(1 + kpine*t)**(-npine)  #fire control
+def Q_fire(t):#, t1, k, n):
+    return 500 * np.sin((2 * np.pi * t) / 86400)+1700 #Q0*(1 + kpine*t)**(-npine)  #fire control
     
     #return np.heaviside()
 
@@ -101,6 +116,12 @@ def cabin_ode(t, T):
     return [dT1_dt, dT2_dt]
 
  
+
+
+
+
+
+
 # Initial conditions
 T1_0 = 7
 T2_0 = 5  # Initial temperatures in Celsius
@@ -112,17 +133,65 @@ t_eval = np.linspace(t_start, t_end)  # Time points for evaluation
 # Solve the ODEs
 sol = solve_ivp(cabin_ode, [t_start, t_end], [T1_0, T2_0], t_eval=t_eval, method='RK45')
 
-# Plot results
-plt.figure(figsize=(10, 5))
+
+
+plt.figure(figsize=(10, 8))  # Create the figure
+
+# First subplot - Cabin Temperature Over Time
+plt.subplot(2, 1, 1)  # 2 rows, 1 column, first subplot
 plt.plot(sol.t / 3600, sol.y[0], label="T1 (Downstairs)")
-#plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
+plt.plot(sol.t / 3600, sol.y[1], label="T2 (Upstairs)")
+plt.plot(sol.t / 3600, T_out(t_eval), 'g-', label='Temp Outside')
 
-plt.plot(T_out(t_eval), 'g-', label = 'Temp Outside')
-plt.plot(Q_fire(t_eval)/50, 'r-',  label = 'Energy of Fire')
+plt.axhline(y=low_limit, color='black', linestyle='--', label='Low Temp Boundary')
+plt.axhline(y=high_limit, color='black', linestyle='--', label='High Temp Boundary')
 
-plt.xlabel("Time (hours)")
 plt.ylabel("Temperature (°C)")
 plt.legend()
-plt.title("Cabin Temperature Over Time ")
+plt.title("Cabin Temperature Over Time")
 plt.grid()
-plt.show()
+
+# Second subplot - Fire Energy Over Time
+plt.subplot(2, 1, 2)  # 2 rows, 1 column, second subplot
+plt.plot(sol.t / 3600, Q_fire(t_eval) / 50, 'r-', label='Energy of Fire')
+
+plt.xlabel("Time (hours)")
+plt.ylabel("Fire Energy (kW)")
+plt.legend()
+plt.title("Fire Energy")
+plt.grid()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
