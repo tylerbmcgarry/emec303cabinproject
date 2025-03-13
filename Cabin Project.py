@@ -73,17 +73,27 @@ def T_out(t):
 def Q_fire(add_log, add_time, t):
     t = np.asarray(t)
     log_time = t - add_time  # Time since log was added
-    return np.where(log_time >= 0, add_log * 500 * (1 + koak * t/3600) ** -noak, 0)
+    return np.where(log_time >= 0, add_log * 500 * (1 + koak * log_time/3600) ** -noak, 0)
 
 
 # Define Qin outside of Q_fire
 def Qin(t):
     return (
-        Q_fire(6, 0 * 3600, t) +
-        Q_fire(4, 4 * 3600, t) +
-        Q_fire(20, 12 * 3600, t) +
-        Q_fire(50, 18 * 3600, t) +
-        Q_fire(1, 24 * 3600, t)
+        Q_fire(5,  0 * 3600, t) +
+        Q_fire(2,  2 * 3600, t) +
+        Q_fire(3,  4 * 3600, t) +
+        Q_fire(2,  6 * 3600, t) +
+        Q_fire(1, 20 * 3600, t) +
+        Q_fire(1, 22 * 3600, t) +
+        Q_fire(3, 24 * 3600, t) +
+        Q_fire(1, 26 * 3600, t) +
+        Q_fire(2, 28 * 3600, t) +
+        Q_fire(2, 30 * 3600, t) +
+        Q_fire(1, 36 * 3600, t) +
+        Q_fire(0, 42 * 3600, t) +
+        Q_fire(1, 44 * 3600, t) +
+        Q_fire(1, 46 * 3600, t) +
+        Q_fire(0, 48 * 3600, t) 
     )
 
 
@@ -99,7 +109,7 @@ def Q_in_fire(t):
 
 #%%System of ODE's
 
-k2 = 10 
+k2 = 5
 
 def dT1_dt(t,T1,T2):  
    
@@ -138,7 +148,8 @@ high_limit = 27
 
 
 
-# First subplot - Cabin Temperature Over Time
+
+# First plot - Cabin Temperature Over Time
 #plt.subplot(2, 1, 1)
 plt.figure(3)
 plt.plot(time / 3600, T1, label="T1 (Downstairs)")
@@ -148,13 +159,21 @@ plt.plot(t_vals / 3600, T_out(t_vals), 'g-', label='Temp Outside')
 plt.axhline(y=low_limit, color='black', linestyle='--', label='Temp Boundary')
 plt.axhline(y=high_limit, color='black', linestyle='--',)
 
+# plt.axhline(x = 12, color='blue', linestyle='--', label='First Night')
+# plt.axhline(x = 18, color='blue', linestyle='--',)
+
+# plt.axhline(x = 36, color='red', linestyle='--', label='Second Night')
+# plt.axhline(x = 42, color='red', linestyle='--',)
+
+plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
+
 plt.ylabel("Temperature (°C)")
 plt.legend()
 plt.title("Cabin Temperature Over Time")
 plt.grid()
 
 # Second subplot - Fire Energy Over Time
-#plt.subplot(2, 1, 2)  # 2 rows, 1 column, second subplot
+# plt.subplot(2, 1, 2)  # 2 rows, 1 column, second subplot
 # plt.plot(time / 3600, Q_in_fire(time) / 50, 'r-', label='Energy of Fire')
 
 # plt.xlabel("Time (hours)")
@@ -162,28 +181,4 @@ plt.grid()
 # plt.legend()
 # plt.title("Fire Energy")
 # plt.grid()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
