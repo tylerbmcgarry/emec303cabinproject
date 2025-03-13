@@ -63,9 +63,7 @@ A_ceil = L1*W  #ceiling area in m2
 def T_out(t):
     return -10 * np.sin((2 * np.pi * t) / 86400)
 
-# plt.figure(1)
-# plt.plot(t_vals/3600, T_out(t_vals))
-# plt.show()
+
 
 #%% Fireplace : Qin
 
@@ -79,10 +77,10 @@ def Q_fire(add_log, add_time, t):
 # Define Qin outside of Q_fire
 def Qin(t):
     return (
-        Q_fire(5,  0 * 3600, t) +
-        Q_fire(2,  2 * 3600, t) +
-        Q_fire(3,  4 * 3600, t) +
-        Q_fire(2,  6 * 3600, t) +
+        Q_fire(5, 0 * 3600, t) +
+        Q_fire(2, 2 * 3600, t) +
+        Q_fire(3, 4 * 3600, t) +
+        Q_fire(2, 6 * 3600, t) +
         Q_fire(1, 20 * 3600, t) +
         Q_fire(1, 22 * 3600, t) +
         Q_fire(3, 24 * 3600, t) +
@@ -90,6 +88,8 @@ def Qin(t):
         Q_fire(2, 28 * 3600, t) +
         Q_fire(2, 30 * 3600, t) +
         Q_fire(1, 36 * 3600, t) +
+        Q_fire(0, 38 * 3600, t) +
+        Q_fire(0, 40 * 3600, t) +
         Q_fire(0, 42 * 3600, t) +
         Q_fire(1, 44 * 3600, t) +
         Q_fire(1, 46 * 3600, t) +
@@ -110,6 +110,13 @@ def Q_in_fire(t):
 #%%System of ODE's
 
 k2 = 5
+
+def dT1_dt_0(t,T1,T2):  
+   
+    Q_wall = k1 * (T1 - T_out(t))
+    Q_ceil = k2 * (T1 - T2)
+    
+    return ( (-A_walls * Q_wall) - (A_ceil * Q_ceil) + (A_fire * 0) ) / (C_air * rho_air * V_bot)
 
 def dT1_dt(t,T1,T2):  
    
@@ -137,7 +144,11 @@ t_eval = np.linspace(t_start, t_end)  # Time points for evaluation
 t0 = t_start
 h = 60
 L = t_end
+
+time, T10, T20 = euler_multi(dT1_dt_0, dT2_dt, t0, T1_0, T2_0, h, L)
+
 time, T1, T2 = euler_multi(dT1_dt, dT2_dt, t0, T1_0, T2_0, h, L)
+
 
 #%% Plot
 plt.figure(figsize=(10, 8))  # Create the figure
@@ -146,18 +157,59 @@ plt.figure(figsize=(10, 8))  # Create the figure
 low_limit = 12.5
 high_limit = 27
 
+# Plot 1 Tout vs Time
+plt.figure(1)
+plt.plot(t_vals/3600, T_out(t_vals))
 
+plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
 
+plt.xlabel("Time (hours)")
+plt.ylabel("Temperature (°C)")
+plt.legend()
+plt.title("Tout vs Time")
+plt.grid()
 
-# First plot - Cabin Temperature Over Time
-#plt.subplot(2, 1, 1)
+# Plot 2 Cabin Temperature vs Time (Qin = 0)
+plt.figure(2)
+plt.plot(time / 3600, T10, label="T1 (Downstairs)")
+plt.plot(time / 3600, T20, label="T2 (Upstairs)")
+
+plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
+
+plt.xlabel("Time (hours)")
+plt.ylabel("Temperature (°C)")
+plt.legend()
+plt.title("Cabin Temperature Over Time (Qin = 0)")
+plt.grid()
+
+#Plot 3 Control Function
 plt.figure(3)
+plt.plot(time / 3600, Q_in_fire(time) / 50, 'r-', label='Energy of Qin')
+
+plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
+
+plt.xlabel("Time (hours)")
+plt.ylabel("Qin Energy (kW)")
+plt.legend()
+plt.title("Control")
+plt.grid()
+
+#Plot 4 Cabin Temperature vs Time with control
+plt.figure(4)
 plt.plot(time / 3600, T1, label="T1 (Downstairs)")
 plt.plot(time / 3600, T2, label="T2 (Upstairs)")
-plt.plot(t_vals / 3600, T_out(t_vals), 'g-', label='Temp Outside')
+#plt.plot(t_vals / 3600, T_out(t_vals), 'g-', label='Temp Outside')
 
 plt.axhline(y=low_limit, color='black', linestyle='--', label='Temp Boundary')
 plt.axhline(y=high_limit, color='black', linestyle='--',)
+
+plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
+
+plt.xlabel("Time (hours)")
+plt.ylabel("Temperature (°C)")
+plt.legend()
+plt.title("Cabin Temperature Over Time")
+plt.grid()
 
 # plt.axhline(x = 12, color='blue', linestyle='--', label='First Night')
 # plt.axhline(x = 18, color='blue', linestyle='--',)
@@ -165,20 +217,5 @@ plt.axhline(y=high_limit, color='black', linestyle='--',)
 # plt.axhline(x = 36, color='red', linestyle='--', label='Second Night')
 # plt.axhline(x = 42, color='red', linestyle='--',)
 
-plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
 
-plt.ylabel("Temperature (°C)")
-plt.legend()
-plt.title("Cabin Temperature Over Time")
-plt.grid()
-
-# Second subplot - Fire Energy Over Time
-# plt.subplot(2, 1, 2)  # 2 rows, 1 column, second subplot
-# plt.plot(time / 3600, Q_in_fire(time) / 50, 'r-', label='Energy of Fire')
-
-# plt.xlabel("Time (hours)")
-# plt.ylabel("Fire Energy (kW)")
-# plt.legend()
-# plt.title("Fire Energy")
-# plt.grid()
 
