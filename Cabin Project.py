@@ -166,7 +166,7 @@ plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
 plt.xlabel("Time (hours)")
 plt.ylabel("Temperature (°C)")
 plt.legend()
-plt.title("Tout vs Time")
+plt.title("Outside Temp vs Time")
 plt.grid()
 
 # Plot 2 Cabin Temperature vs Time (Qin = 0)
@@ -191,7 +191,7 @@ plt.xticks(np.arange(0, max(time / 3600) + 6, 6))
 plt.xlabel("Time (hours)")
 plt.ylabel("Qin Energy (kW)")
 plt.legend()
-plt.title("Control")
+plt.title("Fire ontrol")
 plt.grid()
 
 #Plot 4 Cabin Temperature vs Time with control
